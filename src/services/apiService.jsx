@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 
-const API_URL = "http://localhost:8080/api/students";
+const API_URL = "https://crud-render-h6q5.onrender.com/api/students";
 
 export const getStudents = async () => {
   try {
