@@ -48,10 +48,30 @@ const StudentList = () => {
     }, []);
 
     const getId = async (id) => {
-        const data = await getStudentById(id);
-        setStudent(data);
-        navigate("/students");
-        console.log("Student ", data);
+        setLoading(true);
+        setProgress(0);
+        let interval;
+        try{
+            interval = setInterval(()=>{
+                setProgress((prev)=> Math.min(prev + 10, 98));
+            }, 100);
+            
+            const data = await getStudentById(id);
+            if(data){
+                setStudent(data);
+                clearInterval(interval);
+                setProgress(100);
+                navigate("/students");
+                console.log("Student ", data);
+            }
+
+        }catch(error){
+            console.log("Error loading students", error);
+        }finally{
+            setLoading(false);
+        }
+        
+        
     }
     const onEdit = (student) => {
         setStudent(student);
