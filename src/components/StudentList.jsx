@@ -75,7 +75,7 @@ const StudentList = () => {
     }
     const onEdit = (student) => {
         setStudent(student);
-        navigate("/students");
+        navigate("/students");  
         console.log("Student ", student);
     }
     const onDelete = async (id) => {

@@ -7,7 +7,23 @@ import { StudentContext } from '../contexts/StudentContext';
 import InputGroup from 'react-bootstrap/InputGroup';
 import { updateStudent, createStudent } from '../services/apiService';
 import LoadingProgressBar from "../loadingProgress/LoadingProgressBar";
-
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import {
+  ClassicEditor,
+  Bold,
+  Essentials,
+  Heading,
+  Indent,
+  IndentBlock,
+  Italic,
+  Link,
+  List,
+  MediaEmbed,
+  Paragraph,
+  Table,
+  Undo
+} from 'ckeditor5';
+import 'ckeditor5/ckeditor5.css';
 
 const StudentForm=()=>{
     const navigate = useNavigate();
@@ -64,6 +80,15 @@ const StudentForm=()=>{
     const handleChange=(e)=>{
         setStudent({...form, [e.target.name]: e.target.value});
     }
+
+    const handleCKEditorChange = (event, editor) => {
+        const data = editor.getData();
+        setForm({
+            ...form,
+            dob: data,
+        });
+    };
+
     return (
         <div>
             <LoadingProgressBar progress={progress} />
@@ -84,10 +109,10 @@ const StudentForm=()=>{
                 <InputGroup.Text>Address</InputGroup.Text>
                 <Form.Control value={form.address} name='address' onChange={handleChange} aria-label="Address" />
                 </InputGroup>
-                <InputGroup >
+                {/* <InputGroup >
                 <InputGroup.Text>POB</InputGroup.Text>
                 <Form.Control value={form.dob} name='dob' onChange={handleChange} aria-label="DOB" />
-                </InputGroup>
+                </InputGroup> */}
                 <InputGroup >
                 <InputGroup.Text>Status</InputGroup.Text>
                 <Form.Control value={form.status} name='status' onChange={handleChange} aria-label="Status" />
@@ -98,7 +123,36 @@ const StudentForm=()=>{
                 {form.id ? 'Update' : 'Create'}
             </Button>
             </Form>
+            <CKEditor 
+            data={form.dob}
+            onChange={handleCKEditorChange}
+            editor={ ClassicEditor }
+            config={ {
+                toolbar: [
+                'undo', 'redo', '|',
+                'heading', '|', 'bold', 'italic', '|',
+                'link', 'insertTable', 'mediaEmbed', '|',
+                'bulletedList', 'numberedList', 'indent', 'outdent'
+                ],
+                plugins: [
+                Bold,
+                Essentials,
+                Heading,
+                Indent,
+                IndentBlock,
+                Italic,
+                Link,
+                List,
+                MediaEmbed,
+                Paragraph,
+                Table,
+                Undo
+                ],
+                initialData: '',
+            } }
+            />
         </div>
+        
     )
 }
 export default StudentForm;
