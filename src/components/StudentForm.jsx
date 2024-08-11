@@ -1,3 +1,4 @@
+/* eslint-disable no-const-assign */
 /* eslint-disable no-unused-vars */
 import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
@@ -24,8 +25,12 @@ import {
   Undo
 } from 'ckeditor5';
 import 'ckeditor5/ckeditor5.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useToast } from '../toastContext/ToastContext';
 
 const StudentForm=()=>{
+    const { showToast } = useToast();
     const navigate = useNavigate();
     const [progress, setProgress] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -65,16 +70,49 @@ const StudentForm=()=>{
 
     const onSubmit=async(e)=>{
         e.preventDefault();
+
+        let message = '';
+        let type = '';
+
         if(form.id){
-            console.log("Student ", form);
-            const result = await updateStudent(form);
-            console.log(result);
+
+            try{
+                console.log("Student ", form);
+                const result = await updateStudent(form);
+                if(result){
+                    message = 'Student Updated Successfully';
+                    type = 'success';
+                }else{
+                    message = 'Student Updated Failed';
+                    type = 'error';
+                }
+                console.log(result);
+                
+            }catch(error){
+                message = 'Something when wrong: ',error;
+                type = 'error';
+            }
+
         }else{
             const result = await createStudent(form);
             console.log(result);
+            try{
+                if(result){
+                    message = 'Student Created Successfully';
+                    type = 'success';
+                }else{
+                    message = 'Student Create Failed';
+                    type = 'error';
+                }
+            }
+            catch(error){
+                message = 'Something when wrong: ',error;
+                type = 'error';
+            }
         }
-        
-        navigate("/");
+       
+            navigate("/", {state: { message: message, type: type}});
+      
     }
 
     const handleChange=(e)=>{
@@ -88,6 +126,16 @@ const StudentForm=()=>{
             dob: data,
         });
     };
+
+    const toastSuccess = () =>{
+        toast.success('Student Created Successfully');
+    }
+    const toastFail = () =>{
+        toast.error('Student Created Successfully');
+    }
+    const toastWarning = () =>{
+        toast.warning('Student Created Successfully');
+    }
 
     return (
         <div>
@@ -118,7 +166,7 @@ const StudentForm=()=>{
                 <Form.Control value={form.status} name='status' onChange={handleChange} aria-label="Status" />
                 </InputGroup>
 
-
+            
             <Button variant="primary" type="submit">
                 {form.id ? 'Update' : 'Create'}
             </Button>
@@ -151,6 +199,10 @@ const StudentForm=()=>{
                 initialData: '',
             } }
             />
+            <Button className='btn btn-success' onClick={toastSuccess}>Sucesss</Button>
+            <Button className='btn btn-btn-primary' onClick={toastFail}>Error</Button>
+            <Button className='btn btn-warning' onClick={toastWarning}>Warning</Button>
+            <ToastContainer />
         </div>
         
     )

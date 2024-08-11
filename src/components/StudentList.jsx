@@ -1,15 +1,20 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useState, useContext } from "react";
 import { getStudents } from "../services/apiService";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import { StudentContext } from "../contexts/StudentContext";
 import { deleteStudent, getStudentById } from "../services/apiService";
 import StatusIndicator from "../statusIndicator/StatusIndicator";
 import LoadingProgressBar from "../loadingProgress/LoadingProgressBar";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useToast } from "../toastContext/ToastContext";
 
 const StudentList = () => {
+    const { state} = useLocation();
+    const { showToast } = useToast();
     const [students, setStudents] = useState([]);
     const [progress, setProgress] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -43,9 +48,12 @@ const StudentList = () => {
     };
 
     useEffect(() => {
+        if(state && state.message){
+            showToast(state.type, state.message);
+        }
         loadStudents();
         
-    }, []);
+    }, [state, showToast]);
 
     const getId = async (id) => {
         setLoading(true);
@@ -123,7 +131,7 @@ const StudentList = () => {
                     ))}
                 </tbody>
             </Table>
- 
+            <ToastContainer />            
         </div>
     )
 }
