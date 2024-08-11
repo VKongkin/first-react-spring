@@ -114,18 +114,24 @@ const StudentForm=()=>{
             navigate("/", {state: { message: message, type: type}});
       
     }
-
-    const handleChange=(e)=>{
-        setStudent({...form, [e.target.name]: e.target.value});
-    }
-
-    const handleCKEditorChange = (event, editor) => {
-        const data = editor.getData();
-        setForm({
-            ...form,
-            dob: data,
-        });
+    const handleChange = (e, editor = null) => {
+        if (editor) {
+            // Handle CKEditor change
+            const data = editor.getData();
+            setForm((prevForm) => ({
+                ...prevForm,
+                [e]: data, // `e` should be the field name passed when calling this function
+            }));
+        } else {
+            // Handle regular input change
+            const { name, value } = e.target;
+            setForm((prevForm) => ({
+                ...prevForm,
+                [name]: value,
+            }));
+        }
     };
+    
 
     const toastSuccess = () =>{
         toast.success('Student Created Successfully');
@@ -161,6 +167,35 @@ const StudentForm=()=>{
                 <InputGroup.Text>POB</InputGroup.Text>
                 <Form.Control value={form.dob} name='dob' onChange={handleChange} aria-label="DOB" />
                 </InputGroup> */}
+                
+                <CKEditor 
+                    data={form.dob}
+                    onChange={(event, editor) => handleChange('dob', editor)}
+                    editor={ ClassicEditor }
+                    config={ {
+                        toolbar: [
+                        'undo', 'redo', '|',
+                        'heading', '|', 'bold', 'italic', '|',
+                        'link', 'insertTable', 'mediaEmbed', '|',
+                        'bulletedList', 'numberedList', 'indent', 'outdent'
+                        ],
+                        plugins: [
+                        Bold,
+                        Essentials,
+                        Heading,
+                        Indent,
+                        IndentBlock,
+                        Italic,
+                        Link,
+                        List,
+                        MediaEmbed,
+                        Paragraph,
+                        Table,
+                        Undo
+                        ],
+                        initialData: '',
+                    } }
+                />
                 <InputGroup >
                 <InputGroup.Text>Status</InputGroup.Text>
                 <Form.Control value={form.status} name='status' onChange={handleChange} aria-label="Status" />
@@ -171,34 +206,7 @@ const StudentForm=()=>{
                 {form.id ? 'Update' : 'Create'}
             </Button>
             </Form>
-            <CKEditor 
-            data={form.dob}
-            onChange={handleCKEditorChange}
-            editor={ ClassicEditor }
-            config={ {
-                toolbar: [
-                'undo', 'redo', '|',
-                'heading', '|', 'bold', 'italic', '|',
-                'link', 'insertTable', 'mediaEmbed', '|',
-                'bulletedList', 'numberedList', 'indent', 'outdent'
-                ],
-                plugins: [
-                Bold,
-                Essentials,
-                Heading,
-                Indent,
-                IndentBlock,
-                Italic,
-                Link,
-                List,
-                MediaEmbed,
-                Paragraph,
-                Table,
-                Undo
-                ],
-                initialData: '',
-            } }
-            />
+            
             <Button className='btn btn-success' onClick={toastSuccess}>Sucesss</Button>
             <Button className='btn btn-btn-primary' onClick={toastFail}>Error</Button>
             <Button className='btn btn-warning' onClick={toastWarning}>Warning</Button>
