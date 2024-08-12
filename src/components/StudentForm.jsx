@@ -28,6 +28,8 @@ import 'ckeditor5/ckeditor5.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useToast } from '../toastContext/ToastContext';
+import Container from 'react-bootstrap/Container';
+
 
 const StudentForm=()=>{
     const { showToast } = useToast();
@@ -144,8 +146,10 @@ const StudentForm=()=>{
     }
 
     return (
-        <div>
+        <>
             <LoadingProgressBar progress={progress} />
+
+        <Container>
             <h1>Student Form</h1>
             <Button variant="outline-primary" onClick={()=> onBack()}>Back to Student List</Button>
 
@@ -211,7 +215,8 @@ const StudentForm=()=>{
             <Button className='btn btn-btn-primary' onClick={toastFail}>Error</Button>
             <Button className='btn btn-warning' onClick={toastWarning}>Warning</Button>
             <ToastContainer />
-        </div>
+            </Container>
+        </>
         
     )
 }

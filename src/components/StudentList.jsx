@@ -11,6 +11,8 @@ import LoadingProgressBar from "../loadingProgress/LoadingProgressBar";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useToast } from "../toastContext/ToastContext";
+import Container from 'react-bootstrap/Container';
+
 
 const StudentList = () => {
     const { state} = useLocation();
@@ -99,8 +101,12 @@ const StudentList = () => {
     }
 
     return(
-        <div>
+
+        <>
             <LoadingProgressBar progress={progress} />
+
+            
+        <Container>
             <h1>Student List</h1>
             <Button variant="outline-primary" onClick={()=> studentForm()}>Create</Button>
             <Table striped bordered hover>
@@ -131,8 +137,9 @@ const StudentList = () => {
                     ))}
                 </tbody>
             </Table>
-            <ToastContainer />            
-        </div>
+            <ToastContainer />       
+            </Container>     
+        </>
     )
 }
 
