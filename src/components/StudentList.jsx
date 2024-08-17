@@ -128,7 +128,7 @@ const StudentList = () => {
                             <td>{student.name}</td>
                             <td>
                             <img 
-                                src={`http://localhost:8080/api/sharepoint/image/${student.imagePath}`} 
+                                src={`https://crud-render-h6q5.onrender.com/api/sharepoint/image/${student.imagePath}`} 
                                 alt={student.name} 
                                 style={{ width: '100px', height: 'auto' }} // Adjust size as needed
                             />
