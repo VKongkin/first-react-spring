@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 
 const API_URL = "https://crud-render-h6q5.onrender.com/api/students";
+// const API_URL = "http://localhost:8080/api/students";
 
 export const getStudents = async () => {
   try {
@@ -37,6 +38,25 @@ export const createStudent = async (student) =>{
   });
   return response.text();
 }
+
+export const createWithFile = async (student, file) => {
+  const formData = new FormData();
+  formData.append('student', JSON.stringify(student));
+  if (file) {
+    formData.append('file', file);
+  }
+
+  try {
+    const response = await fetch(API_URL+"/createFile", {
+      method: 'POST',
+      body: formData
+    });
+    return await response.json();
+  } catch (error) {
+    console.error('Error uploading data:', error);
+    throw error;
+  }
+};
 
 export const deleteStudent = async (student) =>{
   const response = await fetch(API_URL+"/delete", {

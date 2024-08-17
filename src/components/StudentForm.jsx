@@ -6,7 +6,7 @@ import Form from 'react-bootstrap/Form';
 import { useState, useContext, useEffect } from 'react';
 import { StudentContext } from '../contexts/StudentContext';
 import InputGroup from 'react-bootstrap/InputGroup';
-import { updateStudent, createStudent } from '../services/apiService';
+import { updateStudent, createStudent, createWithFile } from '../services/apiService';
 import LoadingProgressBar from "../loadingProgress/LoadingProgressBar";
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import {
@@ -38,6 +38,7 @@ const StudentForm=()=>{
     const [loading, setLoading] = useState(true);
     const {student, setStudent} = useContext(StudentContext);
     const [ form, setForm]=useState({id: '', name: '', address: '', dob: '', status: ''});
+    const [file, setFile] = useState(null);
 
     useEffect(() => {
 
@@ -69,9 +70,42 @@ const StudentForm=()=>{
         navigate("/");
     
     }
+    const test = async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('student', JSON.stringify(form));
+        if (file) {
+          formData.append('file', file);
+        }
+      
+        // Log the contents of the FormData object
+        for (let [key, value] of formData.entries()) {
+          console.log(`${key}: ${value}`);
+        }
+      
+        try {
+          const response = await fetch('http://localhost:8080/api/students/createFile', {
+            method: 'POST',
+            body: formData
+          });
+          const result = await response.json();
+          console.log('Response:', result);
+        } catch (error) {
+          console.error('Error uploading data:', error);
+        }
+      };
+      
 
     const onSubmit=async(e)=>{
         e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('student', JSON.stringify(form)); // Convert form data to JSON string
+        if (file) {
+            console.log("File ", file);
+            formData.append('file', file); // Append the file, if any
+            
+        }
 
         let message = '';
         let type = '';
@@ -96,20 +130,19 @@ const StudentForm=()=>{
             }
 
         }else{
-            const result = await createStudent(form);
-            console.log(result);
-            try{
-                if(result){
-                    message = 'Student Created Successfully';
+            try {
+                const response = await createWithFile(form, file);
+                if (response) {
+                    console.log('Student created successfully:', await response.json());
+                    message = 'Student created Successfully';
                     type = 'success';
-                }else{
-                    message = 'Student Create Failed';
+                } else {
+                    message = 'Student created Failed';
                     type = 'error';
                 }
-            }
-            catch(error){
-                message = 'Something when wrong: ',error;
-                type = 'error';
+            } catch (error) {
+                console.error('Error creating student:', error);
+                toast.error('An error occurred while creating the student.');
             }
         }
        
@@ -132,6 +165,10 @@ const StudentForm=()=>{
                 [name]: value,
             }));
         }
+    };
+
+    const handleFileChange = (e) => {
+        setFile(e.target.files[0]);
     };
     
 
@@ -204,6 +241,10 @@ const StudentForm=()=>{
                 <InputGroup.Text>Status</InputGroup.Text>
                 <Form.Control value={form.status} name='status' onChange={handleChange} aria-label="Status" />
                 </InputGroup>
+                <InputGroup className="mb-3">
+                    <InputGroup.Text>Upload File</InputGroup.Text>
+                    <Form.Control type="file" onChange={handleFileChange} />
+                </InputGroup>
 
             
             <Button variant="primary" type="submit">
@@ -214,6 +255,7 @@ const StudentForm=()=>{
             <Button className='btn btn-success' onClick={toastSuccess}>Sucesss</Button>
             <Button className='btn btn-btn-primary' onClick={toastFail}>Error</Button>
             <Button className='btn btn-warning' onClick={toastWarning}>Warning</Button>
+            <Button className='btn btn-info' onClick={test}>Test</Button>
             <ToastContainer />
             </Container>
         </>

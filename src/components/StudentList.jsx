@@ -114,6 +114,7 @@ const StudentList = () => {
                 <tr>
                     <th>#</th>
                     <th>Name</th>
+                    <th>Image</th>
                     <th>Address</th>
                     <th>POB</th>
                     <th>Status</th>
@@ -125,6 +126,13 @@ const StudentList = () => {
                         <tr key={student.id}>
                             <td>{student.id}</td>
                             <td>{student.name}</td>
+                            <td>
+                            <img 
+                                src={`http://localhost:8080/api/sharepoint/image/${student.imagePath}`} 
+                                alt={student.name} 
+                                style={{ width: '100px', height: 'auto' }} // Adjust size as needed
+                            />
+                            </td>
                             <td>{student.address}</td>
                             <td>{student.dob}</td>
                             <td><StatusIndicator status={student.status} /></td>
