@@ -22,6 +22,7 @@ const NavBar = () => {
                 <Nav className="me-auto">
                     <Nav.Link as={NavLink} to={"/"}>Home</Nav.Link>
                     <Nav.Link as={NavLink} to={"/students"} >Create</Nav.Link>
+                    <Nav.Link as={NavLink} to={"/img"} >Image</Nav.Link>
                     <Nav.Link href="#pricing">Pricing</Nav.Link>
                 </Nav>
                 </Container>

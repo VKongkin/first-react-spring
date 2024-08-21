@@ -5,14 +5,14 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import { StudentContext } from "../contexts/StudentContext";
-import { deleteStudent, getStudentById } from "../services/apiService";
+import { deleteStudent, getStudentById, getAccessToken, getFileContent } from "../services/apiService";
 import StatusIndicator from "../statusIndicator/StatusIndicator";
 import LoadingProgressBar from "../loadingProgress/LoadingProgressBar";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useToast } from "../toastContext/ToastContext";
 import Container from 'react-bootstrap/Container';
-
+    
 
 const StudentList = () => {
     const { state} = useLocation();
@@ -22,9 +22,26 @@ const StudentList = () => {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const { setStudent } = useContext(StudentContext);
+    const SITE_ID = import.meta.env.VITE_SITE_ID;
+    const DRIVE_ID = import.meta.env.VITE_DRIVE_ID;
+    const [token, setToken] = useState(null);
+
+    const [imageSrcs, setImageSrcs] = useState({});
+    const [fileContent, setFileContent] = useState(null);
+
+    // const imageUrl = async (imagePath) => {
+    //     const image = await fetch("https://graph.microsoft.com/v1.0/sites/"+ SITE_ID +"/drives/"+ DRIVE_ID +"/root:/Shared Documents/images/"+ imagePath +":/content");
+    //     return image;
+    // }
+
+
+
+
+
 
 
     const loadStudents = async () => {
+
         setLoading(true);
         setProgress(0);
         let interval;
@@ -50,10 +67,18 @@ const StudentList = () => {
     };
 
     useEffect(() => {
+        
+         
         if(state && state.message){
             showToast(state.type, state.message);
         }
         loadStudents();
+        const fetchData = async () => {
+            const content = await getFileContent("your-filename.jpg");
+            setFileContent(content);
+          };
+      
+          fetchData();
         
     }, [state, showToast]);
 
@@ -80,8 +105,6 @@ const StudentList = () => {
         }finally{
             setLoading(false);
         }
-        
-        
     }
     const onEdit = (student) => {
         setStudent(student);
@@ -100,11 +123,20 @@ const StudentList = () => {
         navigate("/students");
     }
 
+    const test = async () => {
+        const accessToken = await getAccessToken();
+        const token = accessToken.access_token;
+        console.log("Token ", token);
+        const img = getFileContent("download.png", token)
+        setImageSrcs(img);
+    }
+
     return(
 
         <>
             <LoadingProgressBar progress={progress} />
-
+        <Button variant="outline-primary" onClick={()=> test()}>Test</Button>
+        <img src={imageSrcs} alt="File content" />
             
         <Container>
             <h1>Student List</h1>
@@ -122,24 +154,30 @@ const StudentList = () => {
                 </tr>
                 </thead>
                 <tbody>
-                {students.map((student) => (
-                        <tr key={student.id}>
-                            <td>{student.id}</td>
-                            <td>{student.name}</td>
+                {students.map(({id, name, address, dob, imagePath, status}) => (
+                        <tr key={id}>
+                            <td>{id}</td>
+                            <td>{name}</td>
                             <td>
-                            <img 
+                            {/* <img 
                                 src={`https://crud-render-h6q5.onrender.com/api/sharepoint/image/${student.imagePath}`} 
+                                // src={`https://graph.microsoft.com/v1.0/sites/${SITE_ID}/drives/${DRIVE_ID}/root:/Shared Documents/images/${student.imagePath}:/content`}
                                 alt={student.name} 
                                 style={{ width: '100px', height: 'auto' }} // Adjust size as needed
-                            />
+                            /> */}
+                            {fileContent ? (
+                                    <img src={URL.createObjectURL(imagePath)} alt="File content" />
+                                ) : (
+                                    "Loading..."
+                                )}
                             </td>
-                            <td>{student.address}</td>
-                            <td>{student.dob}</td>
-                            <td><StatusIndicator status={student.status} /></td>
+                            <td>{address}</td>
+                            <td>{dob}</td>
+                            <td><StatusIndicator status={status} /></td>
                             <td>
-                                <Button variant="outline-primary" onClick={()=> onEdit(student)}>Edit</Button>{' '}
-                                <Button variant="outline-primary" onClick={()=> getId(student.id)}>Edit by ID</Button>{' '}
-                                <Button variant="outline-primary" onClick={()=> onDelete(student.id)}>Delete</Button>{' '}
+                                <Button variant="outline-primary" onClick={()=> onEdit({id, name, address, dob, imagePath, status})}>Edit</Button>{' '}
+                                <Button variant="outline-primary" onClick={()=> getId(id)}>Edit by ID</Button>{' '}
+                                <Button variant="outline-primary" onClick={()=> onDelete(id)}>Delete</Button>{' '}
                             </td>
                         </tr>
                     ))}
